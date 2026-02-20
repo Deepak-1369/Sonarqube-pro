@@ -12,26 +12,12 @@ steps:
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'PreInstalled'
 
-# 2. Build the Java App
+# 2. Build and Analyze with SonarQube
 - task: Maven@4
   inputs:
     mavenPomFile: 'pom.xml'
-    goals: 'clean install'
+    goals: 'clean install sonar:sonar'
     publishJUnitResults: true
     javaHomeOption: 'JDKVersion'
     jdkVersionOption: '17'
-
-# 3. Run SonarQube Analysis using CLI
-- task: SonarQubeCLI@1
-  inputs:
-    scannerMode: 'CLI'
-    configMode: 'manual'
-    cliProjectKey: 'SonarQube-Demo_Sonarqube-pro'
-    cliProjectName: 'Sonarqube-pro'
-    cliSources: '.'
-    extraProperties: |
-      sonar.host.url=$(SONAR_HOST_URL)
-      sonar.login=$(SONAR_LOGIN)
-  env:
-    SONAR_HOST_URL: $(SONAR_HOST_URL)
-    SONAR_LOGIN: $(SONAR_LOGIN)
+    options: '-Dsonar.projectKey=SonarQube-Demo_Sonarqube-pro -Dsonar.projectName=Sonarqube-pro -Dsonar.host.url=$(SONAR_HOST_URL) -Dsonar.login=$(SONAR_LOGIN)'
