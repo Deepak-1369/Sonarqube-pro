@@ -13,7 +13,7 @@
 #- script: echo Hello, world!
 #  displayName: 'Run a one-line script'
 
-#- script: |
+#- script: |  
 #    echo Add other tasks to build, test, and deploy your project.
 #    echo See https://aka.ms/yaml
 #  displayName: 'Run a multi-line script'
@@ -25,22 +25,31 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-
-- task: SonarQubePrepare@5
+# 1. Prepare SonarQube analysis
+- task: SonarQubePrepare@6
   inputs:
-    SonarQube: 'DevOpstoSonar'
-    scannerMode: 'CLI'
-    configMode: 'manual'
-    cliProjectKey: 'SonarQube-Demo_Sonarqube-pro.git_f5749852-68ca-40ad-a25c-850b7573c23b'
-    cliProjectName: 'Sonarqube-pro.git'
-    cliSources: '.'
+    SonarQube: 'DevOpstoSonar' # This must match your Service Connection name exactly
+    scannerMode: 'Other'        # Use 'Other' for Maven or Gradle
+    extraProperties: |
+      sonar.projectKey=SonarQube-Demo_Sonarqube-pro
+      sonar.projectName=Sonarqube-pro
+      sonar.sources=src/main/java
 
-- script: |
-    echo "Building project"
-  displayName: 'Build'
+# 2. Build the Java App and Run Analysis
+# This replaces your "echo Building" script with an actual Maven build
+- task: Maven@4
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'clean install sonar:sonar'
+    publishJUnitResults: true
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.17' # Ensure this matches your project's Java version
+    sonarQubeRunAnalysis: true
 
-- task: SonarQubeAnalyze@5
+# 3. Perform Analysis (Internal processing)
+- task: SonarQubeAnalyze@6
 
-- task: SonarQubePublish@5
+# 4. Publish results to SonarQube dashboard
+- task: SonarQubePublish@6
   inputs:
     pollingTimeoutSec: '300'
