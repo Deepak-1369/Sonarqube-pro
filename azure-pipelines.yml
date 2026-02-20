@@ -33,18 +33,18 @@ steps:
     extraProperties: |
       sonar.projectKey=SonarQube-Demo_Sonarqube-pro
       sonar.projectName=Sonarqube-pro
-      sonar.sources=src/main/java
+      sonar.sources=.
 
 # 2. Build the Java App and Run Analysis
 # This replaces your "echo Building" script with an actual Maven build
 - task: Maven@4
   inputs:
     mavenPomFile: 'pom.xml'
-    goals: 'clean install sonar:sonar'
+    goals: 'clean install'
     publishJUnitResults: true
     javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.17' # Ensure this matches your project's Java version
-    sonarQubeRunAnalysis: true
+    jdkVersionOption: '17' # Ensure this matches your project's Java version
+    sonarQubeRunAnalysis: false
 
 # 3. Perform Analysis (Internal processing)
 - task: SonarQubeAnalyze@6
